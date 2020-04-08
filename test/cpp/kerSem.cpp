@@ -28,17 +28,21 @@ int KernelSem::wait (Time maxTimeToWait)
 		if(maxTimeToWait<=0){
 			PCB::running->status=BLOCKED;
 			PCBblocked->putBlocked(PCB::running, -1); //cekam dok ne dodje signal, ne vraca me tajmer u scheduler
-						lock
-							cout<<"Ubacio u blokirane max <0";
+					#ifndef BCC_BLOCK_IGNORE
+							lock
+							cout<<"Ubacio u blokirane max <0"<<endl;
 						unlock
+#endif
 			dispatch();
 			return 0;
 		}else {
 				PCB::running->status=BLOCKED;
 				PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
+		#ifndef BCC_BLOCK_IGNORE
 				lock
-					cout<<"Ubacio u blokirane";
+					cout<<"Ubacio u blokirane"<<endl;
 				unlock
+		#endif
 				dispatch();
 				return 1;
 		}

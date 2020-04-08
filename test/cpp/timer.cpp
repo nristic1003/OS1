@@ -70,8 +70,8 @@ void interrupt Timer::timer(...)
 		PCB::running->bp = tbp;
 
 		if(PCB::running->status!=IDLE){
-		PCB::running->status=READY;
-		Scheduler::put(PCB::running);
+			PCB::running->status=READY;
+			Scheduler::put(PCB::running);
 		}
 		// scheduler
 		PCB::running =Scheduler::get();
@@ -104,6 +104,19 @@ void interrupt Timer::timer(...)
 	Timer::context_switch_on_demand = 0;
 } else if(PCB::running->status==FINISH || PCB::running->status==BLOCKED)
 {
+
+			asm {
+				// cuva sp
+				mov tsp, sp
+				mov tss, ss
+				mov tbp, bp
+			}
+
+			PCB::running->sp = tsp;
+			PCB::running->ss = tss;
+			PCB::running->bp = tbp;
+
+
 	PCB::running =Scheduler::get();
 	if(PCB::running==0)
 		{

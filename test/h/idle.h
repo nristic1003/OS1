@@ -7,6 +7,7 @@ class Idle: public Thread
 public:
 
 	friend class PCB;
+	friend class Thread;
 	Idle(StackSize stackSize = defaultStackSize, Time timeSlice =defaultTimeSlice);
 	 virtual void run();
 	 virtual ~Idle();

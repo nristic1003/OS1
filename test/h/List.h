@@ -9,7 +9,6 @@ struct Node
   Node *next;
   Node (PCB *p, Node *n=0, int t=0):data(p), next(n), timeWait(t){}
  ~Node(){}
-
 };
 
 

@@ -33,7 +33,7 @@ public:
 void A::run(){
 
 #ifndef BCC_BLOCK_IGNORE
-	sem->wait(20);
+	sem->wait(50);
 	for (int i =0; i < 30; ++i) {
 					lock
 					cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
@@ -52,7 +52,11 @@ class B :public Thread{
 
 public:
 
-	 B():Thread(defaultStackSize,5){};
+	Semaphore* sem;
+	 B():Thread(defaultStackSize,5){
+
+		 sem = new Semaphore(1);
+	 };
 
 	virtual void run();
 
@@ -66,6 +70,7 @@ void B::run(){
 
 #ifndef BCC_BLOCK_IGNORE
 	for (int i =0; i < 30; ++i) {
+		sem->wait(20);
 		lock
 		cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
 		unlock
@@ -93,13 +98,13 @@ int main()
 
 
 	//cntr = mainPCB->timeSlice;
-		//B* t1 = new B();
+		B* t1 = new B();
 		//B* t2 = new B();
-		//A* t3 = new A();
+		A* t3 = new A();
 		A* t4 = new A();
-		//t1->start();
+		t1->start();
 		//t2->start();
-		//t3->start();
+		t3->start();
 		t4->start();
 	unlock
 #endif
@@ -107,7 +112,7 @@ int main()
 
 
 Semaphore * sem2 = new Semaphore(0);
-	sem2->wait(20);
+	sem2->wait(5);
 
 #ifndef BCC_BLOCK_IGNORE
     for (int i = 0; i < 30; ++i) {

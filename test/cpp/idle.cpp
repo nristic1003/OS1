@@ -2,8 +2,9 @@
 #include "PCB.h"
 Idle::Idle(StackSize stackSize, Time timeSlice ): Thread(stackSize, timeSlice)
 {
-	PCB* myPCB = getPCB();
-	myPCB->status = IDLE;
+	myPCB->status=IDLE;
+	//PCB* myPCB = getPCB(); // // SUmnjivo
+//	myPCB->status = IDLE; // //
 
 }
 
