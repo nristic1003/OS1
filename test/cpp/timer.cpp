@@ -117,17 +117,17 @@ void interrupt Timer::timer(...)
 			PCB::running->bp = tbp;
 
 
-	PCB::running =Scheduler::get();
-	if(PCB::running==0)
-		{
-			PCB::running = PCB::PCBlist->getIdle();
-		}
-	PCB::running->status=RUNNING;
-		tsp = PCB::running->sp;
-		tss = PCB::running->ss;
-		tbp = PCB::running->bp;
+			PCB::running =Scheduler::get();
+			if(PCB::running==0)
+			{
+				PCB::running = PCB::PCBlist->getIdle();
+			}
+			PCB::running->status=RUNNING;
+			tsp = PCB::running->sp;
+			tss = PCB::running->ss;
+			tbp = PCB::running->bp;
 
-		cntr = PCB::running->timeSlice;
+			cntr = PCB::running->timeSlice;
 
 		asm {
 			// restaurira sp

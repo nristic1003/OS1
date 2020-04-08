@@ -1,6 +1,8 @@
 #ifndef list_h
 #define list_h
 
+#include "thread.h"
+
 class PCB;
 struct Node
 {
@@ -29,10 +31,11 @@ public:
 	PCB* getFirst();
 	PCB* getIdle();
 	void remove(PCB* p);
+	void removeAll();
 	void decreaseTime();
 	int isEmpty();
 	void iterator();
-	//PCB* getByID(ID id);
+	PCB* getByID(ID id);
 
 	~List();
 

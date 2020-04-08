@@ -14,6 +14,7 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	st1 =0;
 	if(threadId!=1) createStartingContext(); // ID = 1 main nit
 	PCB::PCBlist->put(this);
+	waitForMe = new List();
 };
 
 void PCB::createStartingContext()

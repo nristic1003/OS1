@@ -60,7 +60,7 @@ int KernelSem::getVal() const
 
 KernelSem:: ~KernelSem ()
 {
-
+	delete PCBblocked;
 }
 
 int KernelSem::signal(int n)

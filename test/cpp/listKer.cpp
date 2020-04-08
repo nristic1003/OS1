@@ -34,11 +34,6 @@ void ListKernel::removeAll()
 
 ListKernel::~ListKernel()
 {
-	while(head!=0)
-	{
-		NodeKer *next=head;
-		head=head->next;
-		delete next;
-	}
+	removeAll();
 	last=0;
 }

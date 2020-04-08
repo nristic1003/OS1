@@ -26,11 +26,11 @@ public:
 
 protected:
  friend class PCB;
- friend class Idle;
+
  Thread (StackSize stackSize = defaultStackSize, Time timeSlice =
 defaultTimeSlice);
  virtual void run() {}
-
+ PCB* getPCB();
 
 private:
  PCB* myPCB;

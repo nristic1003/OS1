@@ -1,8 +1,11 @@
 #include <iostream.h>
+#include <stdlib.h>
+#include <malloc.h>
 #include "PCB.h"
 #include "thread.h"
 #include "timer.h"
 #include "semaphor.h"
+#include "kerSem.h"
 #include "idle.h"
 #include <dos.h>
 
@@ -15,10 +18,10 @@
 #define unlock asm popf
 class A :public Thread{
 public:
- Semaphore * sem;
+// Semaphore * sem;
 
 	A():Thread(defaultStackSize,5){
-		sem = new Semaphore(0);
+		//sem = new Semaphore(0);
 	};
 
 	virtual void run();
@@ -33,7 +36,8 @@ public:
 void A::run(){
 
 #ifndef BCC_BLOCK_IGNORE
-	sem->wait(50);
+	//sem->wait(50);
+
 	for (int i =0; i < 30; ++i) {
 					lock
 					cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
@@ -52,10 +56,10 @@ class B :public Thread{
 
 public:
 
-	Semaphore* sem;
+	//Semaphore* sem;
 	 B():Thread(defaultStackSize,5){
 
-		 sem = new Semaphore(1);
+		 //sem = new Semaphore(1);
 	 };
 
 	virtual void run();
@@ -70,7 +74,7 @@ void B::run(){
 
 #ifndef BCC_BLOCK_IGNORE
 	for (int i =0; i < 30; ++i) {
-		sem->wait(20);
+	//	sem->wait(20);
 		lock
 		cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
 		unlock
@@ -79,11 +83,16 @@ void B::run(){
 
 
 	}
+
 #endif
+	delete this;
 }
+
+
 //extern int cntr;
 int main()
 {
+
 #ifndef BCC_BLOCK_IGNORE
 	lock
 	inic();
@@ -111,10 +120,11 @@ int main()
 
 
 
-Semaphore * sem2 = new Semaphore(0);
-	sem2->wait(5);
+//Semaphore * sem2 = new Semaphore(0);
+//	sem2->wait(5);
 
 #ifndef BCC_BLOCK_IGNORE
+	t1->waitToComplete();
     for (int i = 0; i < 30; ++i) {
       lock
       cout<<"main "<<i<<endl;
@@ -125,16 +135,12 @@ Semaphore * sem2 = new Semaphore(0);
     }
 
 
-
-
-
 #endif
+
 
 	restore();
 
-
-
-
+	cout<<"Happy End!"<<endl;
 
 	return 0;
 

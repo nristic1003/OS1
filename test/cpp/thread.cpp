@@ -2,6 +2,7 @@
 #include "PCB.h"
 #include "timer.h"
 #include <dos.h>
+#include <iostream.h>
 
 #define lock asm{\
  		pushf;\
@@ -22,6 +23,20 @@ Thread::Thread (StackSize stackSize, Time timeSlice)
 Thread::~Thread()
 {
 
+	lock
+	cout<<"Odblokiram niti sada!"<<endl;
+	unlock
+	if(myPCB->waitForMe->isEmpty()==0)
+	{
+		PCB* blockedPCB = myPCB->waitForMe->getFirst();
+		while(blockedPCB!=0)
+		{
+			blockedPCB->status= READY;
+			Scheduler::put(blockedPCB);
+			blockedPCB = myPCB->waitForMe->getFirst();
+		}
+	}
+	delete myPCB;
 }
 void Thread::start()
 {
@@ -32,20 +47,25 @@ void Thread::start()
 	}
 
 }
+void Thread::waitToComplete()
+{
+	if(PCB::running->getThreadId() != getId())
+	{
+		PCB::running->status = BLOCKED;
+		myPCB->waitForMe->put(PCB::running);
+		dispatch();
+	}
+}
 
+PCB* Thread::getPCB()
+{
+	return myPCB;
+}
 
 ID Thread::getId() {return myPCB->getThreadId();}
 ID Thread::getRunningId(){return PCB::running->getThreadId();}
 
-/*Thread* Thread::getThreadById(ID id)
-{
-	Node* p = PCBlist;
-	while(p->data->threadId!=id) p=p->next;
-	if(p==0) return -1;
-	return p->data->thread;
 
-}
-*/
 void dispatch()
 {
 #ifndef BCC_BLOCK_IGNORE
@@ -54,4 +74,11 @@ void dispatch()
 		Timer::timer();
 		unlock
 #endif
+}
+
+Thread* Thread::getThreadById(ID id)
+{
+	List* p = PCB::PCBlist;
+	return p->getByID(id)->thread;
+
 }

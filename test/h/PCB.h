@@ -16,6 +16,7 @@ public:
 	unsigned ss;
 	static  List* PCBlist;
 	static	PCB* running;
+	List* waitForMe;
 	Time timeSlice;
 	friend class Thread;
 	enum st status;

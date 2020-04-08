@@ -19,5 +19,5 @@ Semaphore::Semaphore(int init1)
  }
 Semaphore:: ~Semaphore ()
 {
-
+	delete myImpl;
 }

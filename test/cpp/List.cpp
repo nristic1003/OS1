@@ -54,7 +54,7 @@ PCB* List::getFirst()
 
 int List::isEmpty()
 {
-	if(head!=0) return 1;
+	if(head==0) return 1;
 	return 0;
 }
 
@@ -79,13 +79,27 @@ PCB* List::getIdle()
 	return 0;
 
 }
+PCB* List::getByID(ID id)
+{
+	Node*p = head;
+	while(p->data->getThreadId()!=id) p=p->next;
+	return p->data;
+
+}
+
+void List::removeAll()
+{
+
+		while(head!=0)
+		{
+			Node *p=head;
+			head=head->next;
+			delete p;
+		}
+
+}
 List::~List()
 {
-	while(head!=0)
-	{
-		Node *next=head;
-		head=head->next;
-		delete next;
-	}
+	removeAll();
 	last=0;
 }
