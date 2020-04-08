@@ -1,5 +1,7 @@
 #include "timer.h"
 #include "PCB.h"
+#include "kerSem.h"
+#include "listKer.h"
 
 
 volatile unsigned tsp;
@@ -43,13 +45,17 @@ int Timer::context_switch_on_demand=0;
 
 void interrupt Timer::timer(...)
 {
-
-
 	if(PCB::running->status==RUNNING){
 	if (!Timer::context_switch_on_demand) {
+		NodeKer* p = KernelSem::kerList->getHead();
+		while(p!=0)
+		{
+			KernelSem* ker = p->data;
+			List* blokirani = ker->PCBblocked;
+			blokirani->decreaseTime();
+			p=p->next;
+		}
 		cntr--;
-
-
 	}
 	if (cntr == 0 || Timer::context_switch_on_demand) {
 		asm {
@@ -63,10 +69,16 @@ void interrupt Timer::timer(...)
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
 
+		if(PCB::running->status!=IDLE){
 		PCB::running->status=READY;
 		Scheduler::put(PCB::running);
+		}
 		// scheduler
 		PCB::running =Scheduler::get();
+		if(PCB::running==0)
+		{
+			PCB::running = PCB::PCBlist->getIdle();
+		}
 		PCB::running->status=RUNNING;
 
 		tsp = PCB::running->sp;
@@ -90,9 +102,13 @@ void interrupt Timer::timer(...)
 	// samo kada je stvarno doslo do prekida
 	if(!Timer::context_switch_on_demand) oldISR();
 	Timer::context_switch_on_demand = 0;
-} else if(PCB::running->status==FINISH)
+} else if(PCB::running->status==FINISH || PCB::running->status==BLOCKED)
 {
 	PCB::running =Scheduler::get();
+	if(PCB::running==0)
+		{
+			PCB::running = PCB::PCBlist->getIdle();
+		}
 	PCB::running->status=RUNNING;
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;

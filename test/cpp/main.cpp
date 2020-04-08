@@ -2,6 +2,8 @@
 #include "PCB.h"
 #include "thread.h"
 #include "timer.h"
+#include "semaphor.h"
+#include "idle.h"
 #include <dos.h>
 
 #define lock asm{\
@@ -13,9 +15,11 @@
 #define unlock asm popf
 class A :public Thread{
 public:
+ Semaphore * sem;
 
-
-	A():Thread(defaultStackSize,5){ };
+	A():Thread(defaultStackSize,5){
+		sem = new Semaphore(0);
+	};
 
 	virtual void run();
 
@@ -29,6 +33,7 @@ public:
 void A::run(){
 
 #ifndef BCC_BLOCK_IGNORE
+	sem->wait(20);
 	for (int i =0; i < 30; ++i) {
 					lock
 					cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
@@ -84,20 +89,25 @@ int main()
 	PCB::running = mainPCB;
 	mainPCB->status = RUNNING;
 
+	Idle* idl = new Idle(defaultStackSize, 1);
+
+
 	//cntr = mainPCB->timeSlice;
-		B* t1 = new B();
-		B* t2 = new B();
-		A* t3 = new A();
+		//B* t1 = new B();
+		//B* t2 = new B();
+		//A* t3 = new A();
 		A* t4 = new A();
-		t1->start();
-		t2->start();
-		t3->start();
+		//t1->start();
+		//t2->start();
+		//t3->start();
 		t4->start();
 	unlock
 #endif
 
 
 
+Semaphore * sem2 = new Semaphore(0);
+	sem2->wait(20);
 
 #ifndef BCC_BLOCK_IGNORE
     for (int i = 0; i < 30; ++i) {

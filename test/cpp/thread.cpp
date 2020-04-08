@@ -32,6 +32,10 @@ void Thread::start()
 	}
 
 }
+PCB* Thread::getPCB()
+{
+	return myPCB;
+}
 
 ID Thread::getId() {return myPCB->getThreadId();}
 ID Thread::getRunningId(){return PCB::running->getThreadId();}

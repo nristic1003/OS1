@@ -1,12 +1,21 @@
 #include "kerSem.h"
 #include "listKer.h"
+#include <dos.h>
+#include <iostream.h>
+#define lock asm{\
+ 		pushf;\
+ 		cli;\
+}
 
+// dozvoljava prekide
+#define unlock asm popf
 ListKernel* KernelSem::kerList = new ListKernel();
 
 KernelSem::KernelSem(int init1)
 {
 	semValue= init1;
 	PCBblocked = new List();
+	kerList->put(this);
 
 
 }
@@ -16,16 +25,27 @@ int KernelSem::wait (Time maxTimeToWait)
 	semValue--;
 	if(semValue<0)
 	{
-		PCB::running->status=BLOCKED;
-		PCBblocked->putBlocked(PCB::running, maxTimeToWait);
-		dispatch();
-		if(maxTimeToWait==0) return 0;
-		return 1;
+		if(maxTimeToWait<=0){
+			PCB::running->status=BLOCKED;
+			PCBblocked->putBlocked(PCB::running, -1); //cekam dok ne dodje signal, ne vraca me tajmer u scheduler
+						lock
+							cout<<"Ubacio u blokirane max <0";
+						unlock
+			dispatch();
+			return 0;
+		}else {
+				PCB::running->status=BLOCKED;
+				PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
+				lock
+					cout<<"Ubacio u blokirane";
+				unlock
+				dispatch();
+				return 1;
+		}
+
 	}
 	return 1;
 }
-
-
 
 
 int KernelSem::getVal() const

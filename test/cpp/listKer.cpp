@@ -13,7 +13,7 @@ void ListKernel::put(KernelSem* t)
 	}
 }
 
-
+NodeKer* ListKernel::getHead() {return head;}
 
 int ListKernel::isEmpty()
 {

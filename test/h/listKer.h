@@ -27,6 +27,7 @@ public:
 	}
 
 	void put(KernelSem *t);
+	NodeKer* getHead();
 	void removeAll();
 	int isEmpty();
 	~ListKernel();

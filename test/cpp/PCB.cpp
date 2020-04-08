@@ -13,7 +13,7 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	threadId=++id;
 	st1 =0;
 	if(threadId!=1) createStartingContext(); // ID = 1 main nit
-
+	PCB::PCBlist->put(this);
 };
 
 void PCB::createStartingContext()

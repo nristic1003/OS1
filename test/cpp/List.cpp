@@ -1,5 +1,6 @@
 #include "List.h"
-
+#include "SCHEDULE.H"
+#include "PCB.h"
 void List::put(PCB* t)
 {
 	Node *node= new Node(t);
@@ -24,7 +25,21 @@ void List::putBlocked(PCB* t, int time)
 }
 
 
+void List::decreaseTime()
+{
+	Node* p=head;
+	while(p!=0)
+	{
+		p->timeWait -=1;
 
+		if(p->timeWait==0)
+		{
+			p->data->status=READY;
+			Scheduler::put(p->data);
+		}
+		p=p->next;
+	}
+}
 
 PCB* List::getFirst()
 {
@@ -42,26 +57,7 @@ int List::isEmpty()
 	if(head!=0) return 1;
 	return 0;
 }
-void List::removeFirst()
-{
-	if(head!=0)
-	{
-		Node *p =head;
-		head=head->next;
-		delete p;
-	}
-}
-void List::removeLast()
-{
-	if(head!=0)
-	{
-		Node *p = head;
-		while(p->next!=last) p=p->next;
-		last = p;
-		p=last->next;
-		delete p;
-	}
-}
+
 
 void List::iterator()
 {
@@ -70,6 +66,18 @@ void List::iterator()
 	{
 		p=p->next;
 	}
+}
+
+PCB* List::getIdle()
+{
+	if(head!=0)
+	{
+		Node*p = head;
+		while(p->data->status!=IDLE) p=p->next;
+		return p->data;
+	}
+	return 0;
+
 }
 List::~List()
 {

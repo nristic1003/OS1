@@ -28,10 +28,9 @@ public:
 	void put(PCB *t);
 	void putBlocked(PCB *p, int time);
 	PCB* getFirst();
-
+	PCB* getIdle();
 	void remove(PCB* p);
-	void removeFirst();
-	void removeLast();
+	void decreaseTime();
 	int isEmpty();
 	void iterator();
 	//PCB* getByID(ID id);
