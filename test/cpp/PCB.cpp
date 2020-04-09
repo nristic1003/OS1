@@ -39,6 +39,11 @@ void PCB::wrapper()
 {
 	PCB::running->thread->run();
 	PCB::running->status=FINISH;
+	if(PCB::running->waitForMe->isEmpty()==0)
+		{
+			PCB::running->waitForMe->returntoScheduler();
+			PCB::running->waitForMe->removeAll();
+		}
 	dispatch();
 }
 

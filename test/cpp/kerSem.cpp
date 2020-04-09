@@ -22,29 +22,23 @@ KernelSem::KernelSem(int init1)
 
 int KernelSem::wait (Time maxTimeToWait)
 {
+
 	semValue--;
 	if(semValue<0)
 	{
 		if(maxTimeToWait<=0){
 			PCB::running->status=BLOCKED;
 			PCBblocked->putBlocked(PCB::running, -1); //cekam dok ne dodje signal, ne vraca me tajmer u scheduler
-					#ifndef BCC_BLOCK_IGNORE
-							lock
-							cout<<"Ubacio u blokirane max <0"<<endl;
-						unlock
-#endif
+
 			dispatch();
-			return 0;
+			return 1;
 		}else {
+
 				PCB::running->status=BLOCKED;
 				PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
-		#ifndef BCC_BLOCK_IGNORE
-				lock
-					cout<<"Ubacio u blokirane"<<endl;
-				unlock
-		#endif
+
 				dispatch();
-				return 1;
+				return 0;
 		}
 
 	}
@@ -67,14 +61,17 @@ int KernelSem::signal(int n)
 {
 	if(n==0)
 	{
+		lock
 		semValue++;
 		PCB* myPCB=PCBblocked->getFirst();
 		myPCB->status = READY;
 		Scheduler::put(myPCB);
+		unlock
 		return 0;
 
 	}else if(n>0)
 	{
+		lock
 		int cnt=0;
 		while(cnt!=n && !PCBblocked->isEmpty())
 		{
@@ -84,6 +81,7 @@ int KernelSem::signal(int n)
 					Scheduler::put(myPCB);
 					cnt++;
 		}
+		unlock
 		return cnt;
 	}
 	return n;

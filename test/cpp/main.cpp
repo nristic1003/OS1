@@ -89,8 +89,8 @@ void B::run(){
 }
 
 
-//extern int cntr;
-int main()
+extern int userMain(int argc, char* argv[]);
+int main(int argc, char* argv[])
 {
 
 #ifndef BCC_BLOCK_IGNORE
@@ -104,45 +104,17 @@ int main()
 	mainPCB->status = RUNNING;
 
 	Idle* idl = new Idle(defaultStackSize, 1);
-
-
-	//cntr = mainPCB->timeSlice;
-		B* t1 = new B();
-		//B* t2 = new B();
-		A* t3 = new A();
-		A* t4 = new A();
-		t1->start();
-		//t2->start();
-		t3->start();
-		t4->start();
 	unlock
 #endif
 
-
-
-//Semaphore * sem2 = new Semaphore(0);
-//	sem2->wait(5);
-
-#ifndef BCC_BLOCK_IGNORE
-	t1->waitToComplete();
-    for (int i = 0; i < 30; ++i) {
-      lock
-      cout<<"main "<<i<<endl;
-      unlock
-    for (int j = 0; j< 30000; ++j)
-        for (int k = 0; k < 30000; ++k);
-
-    }
-
-
-#endif
+	int ret =userMain(argc, argv);
 
 
 	restore();
 
 	cout<<"Happy End!"<<endl;
 
-	return 0;
+	return ret;
 
 
 

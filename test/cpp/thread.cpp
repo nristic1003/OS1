@@ -22,20 +22,7 @@ Thread::Thread (StackSize stackSize, Time timeSlice)
 }
 Thread::~Thread()
 {
-
-	lock
-	cout<<"Odblokiram niti sada!"<<endl;
-	unlock
-	if(myPCB->waitForMe->isEmpty()==0)
-	{
-		PCB* blockedPCB = myPCB->waitForMe->getFirst();
-		while(blockedPCB!=0)
-		{
-			blockedPCB->status= READY;
-			Scheduler::put(blockedPCB);
-			blockedPCB = myPCB->waitForMe->getFirst();
-		}
-	}
+	waitToComplete();
 	delete myPCB;
 }
 void Thread::start()
@@ -49,7 +36,8 @@ void Thread::start()
 }
 void Thread::waitToComplete()
 {
-	if(PCB::running->getThreadId() != getId())
+
+	if(PCB::running->getThreadId() != getId() && PCB::running!=PCB::PCBlist->getIdle())
 	{
 		PCB::running->status = BLOCKED;
 		myPCB->waitForMe->put(PCB::running);

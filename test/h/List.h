@@ -35,6 +35,7 @@ public:
 	void decreaseTime();
 	int isEmpty();
 	void iterator();
+	void returntoScheduler();
 	PCB* getByID(ID id);
 
 	~List();

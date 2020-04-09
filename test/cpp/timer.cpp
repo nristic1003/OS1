@@ -22,7 +22,9 @@ volatile int cntr=1;
 typedef void interrupt (*pInterrupt)(...);
  pInterrupt oldISR;
 
+extern void tick();
 int Timer::context_switch_on_demand=0;
+
  void inic()
  {
 	#ifndef BCC_BLOCK_IGNORE
@@ -55,6 +57,7 @@ void interrupt Timer::timer(...)
 			blokirani->decreaseTime();
 			p=p->next;
 		}
+		tick();
 		cntr--;
 	}
 	if (cntr == 0 || Timer::context_switch_on_demand) {

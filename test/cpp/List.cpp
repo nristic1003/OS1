@@ -59,12 +59,20 @@ int List::isEmpty()
 }
 
 
-void List::iterator()
+
+
+void List::returntoScheduler()
 {
-	Node *p = head;
-	while(p!=0)
-	{
-		p=p->next;
+		if(head!=0) {
+
+		Node* blockedPCB=head;
+		while(blockedPCB!=0)
+			{
+					blockedPCB->data->status= READY;
+					Scheduler::put(blockedPCB->data);
+					blockedPCB = blockedPCB->next;
+			}
+
 	}
 }
 
@@ -89,7 +97,6 @@ PCB* List::getByID(ID id)
 
 void List::removeAll()
 {
-
 		while(head!=0)
 		{
 			Node *p=head;
