@@ -37,6 +37,7 @@ public:
 	void iterator();
 	void returntoScheduler();
 	PCB* getByID(ID id);
+	Node* getHead(){return head;}
 
 	~List();
 

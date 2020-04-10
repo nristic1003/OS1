@@ -16,78 +16,6 @@
 
 // dozvoljava prekide
 #define unlock asm popf
-class A :public Thread{
-public:
-// Semaphore * sem;
-
-	A():Thread(defaultStackSize,5){
-		//sem = new Semaphore(0);
-	};
-
-	virtual void run();
-
-	virtual ~A(){
-
-	}
-
-
-};
-
-void A::run(){
-
-#ifndef BCC_BLOCK_IGNORE
-	//sem->wait(50);
-
-	for (int i =0; i < 30; ++i) {
-					lock
-					cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
-					unlock
-					for (int k= 0; k<10000; ++k)
-						for (int j = 0; j <30000; ++j);
-
-				}
-
-#endif
-}
-
-
-class B :public Thread{
-
-
-public:
-
-	//Semaphore* sem;
-	 B():Thread(defaultStackSize,5){
-
-		 //sem = new Semaphore(1);
-	 };
-
-	virtual void run();
-
-	virtual ~B(){
-
-
-	}
-};
-
-void B::run(){
-
-#ifndef BCC_BLOCK_IGNORE
-	for (int i =0; i < 30; ++i) {
-	//	sem->wait(20);
-		lock
-		cout<<"ID:"<<this->getId()<<" i = "<<i<<endl;
-		unlock
-		for (int k = 0; k<10000; ++k)
-			for (int j = 0; j <30000; ++j);
-
-
-	}
-
-#endif
-	delete this;
-}
-
 
 extern int userMain(int argc, char* argv[]);
 int main(int argc, char* argv[])
@@ -112,7 +40,6 @@ int main(int argc, char* argv[])
 
 	restore();
 
-	cout<<"Happy End!"<<endl;
 
 	return ret;
 

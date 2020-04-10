@@ -2,7 +2,8 @@
 #include "PCB.h"
 #include "kerSem.h"
 #include "listKer.h"
-
+#include <iostream.h>
+#include <dos.h>
 
 volatile unsigned tsp;
 volatile unsigned tss;
@@ -49,6 +50,8 @@ void interrupt Timer::timer(...)
 {
 	if(PCB::running->status==RUNNING){
 	if (!Timer::context_switch_on_demand) {
+
+
 		NodeKer* p = KernelSem::kerList->getHead();
 		while(p!=0)
 		{
@@ -72,7 +75,8 @@ void interrupt Timer::timer(...)
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
 
-		if(PCB::running->status!=IDLE){
+		if(PCB::running->getThreadId()==2) PCB::running->status=IDLE;
+		if(PCB::running->getThreadId()!=2 ){
 			PCB::running->status=READY;
 			Scheduler::put(PCB::running);
 		}

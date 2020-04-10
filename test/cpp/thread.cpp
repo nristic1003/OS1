@@ -37,7 +37,7 @@ void Thread::start()
 void Thread::waitToComplete()
 {
 
-	if(PCB::running->getThreadId() != getId() && PCB::running!=PCB::PCBlist->getIdle())
+	if(PCB::running!=this->myPCB && PCB::running!=PCB::PCBlist->getIdle() && myPCB->status!=FINISH )
 	{
 		PCB::running->status = BLOCKED;
 		myPCB->waitForMe->put(PCB::running);
