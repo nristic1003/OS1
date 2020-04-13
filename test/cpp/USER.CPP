@@ -148,7 +148,7 @@ int userMain (int argc, char* argv[])
 	*/
 	int buffSize = 20;//atoi(argv[1]);
 	N = 19; //atoi(argv[2]);
-	N = N>19 ? 19 : N;
+	//N = N>19 ? 19 : N;
 	TIME_SLICE = 4;//atoi(argv[3]);
 	
 	if(buffSize<N) {

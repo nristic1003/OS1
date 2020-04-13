@@ -28,6 +28,8 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	waitForMe = new List();
 };
 
+
+
 Thread* PCB::getThread(){
 	return thread;
 }
@@ -69,6 +71,7 @@ ID PCB::getThreadId(){return threadId;}
 
 PCB::~PCB()
 {
+
 	delete waitForMe;
 	delete[] st1;
 }

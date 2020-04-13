@@ -67,18 +67,24 @@ int main(int argc, char* argv[])
 #endif
 
 	int ret =userMain(argc, argv);
+
 	lock
-	cout<<"Zavrsio user main"<<endl;
+	cout<<"Pre idle "<<counter<<endl;
 	unlock
 	Idle::idleDelete();
-	delete PCB::PCBlist;
-	delete mainPCB;
-	delete KernelSem::kerList;
-	while(Scheduler::get());
-
-		lock
-		cout<<counter<<endl;
+	lock
+		cout<<"Pre PCB "<<counter<<endl;
 		unlock
+	delete PCB::PCBlist;
+		lock
+			cout<<"Pre Semafora "<<counter<<endl;
+			unlock
+
+	delete KernelSem::kerList;
+
+			lock
+				cout<<"Pre konacno "<<counter<<endl;
+				unlock
 	restore();
 
 		if(ret==16) cout<<"OK"<<endl;

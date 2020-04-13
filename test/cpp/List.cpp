@@ -46,8 +46,6 @@ void List::remove(PCB* pcb)
 	            cur = cur->next;
 	        }
 
-
-
 	        if((cur->data!=pcb )&& (cur->next==0))
 	            return;
 	        else if((cur->data==pcb) && (cur->next==0)){
@@ -76,7 +74,7 @@ void List::decreaseTime()
 			p=p->next;
 			old->data->status=READY;
 			Scheduler::put(old->data);
-		//	remove(old->data);
+			remove(old->data);
 		}else
 			p=p->next;
 	}
@@ -85,11 +83,7 @@ void List::decreaseTime()
 PCB* List::getFirst()
 {
 	if(head!=0)
-	{
-		Node *p = head;
-		head=head->next;
-		return p->data;
-	}
+		return head->data;
 	return 0;
 }
 
@@ -111,7 +105,9 @@ void List::returntoScheduler()
 			{
 					blockedPCB->data->status= READY;
 					Scheduler::put(blockedPCB->data);
+					remove(blockedPCB->data);
 					blockedPCB = blockedPCB->next;
+
 			}
 
 	}
