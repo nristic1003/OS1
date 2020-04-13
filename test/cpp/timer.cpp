@@ -4,6 +4,8 @@
 #include "listKer.h"
 #include <iostream.h>
 #include <dos.h>
+#include "thread.h"
+#include "idle.h"
 
 volatile unsigned tsp;
 volatile unsigned tss;
@@ -48,10 +50,14 @@ int Timer::context_switch_on_demand=0;
 
 void interrupt Timer::timer(...)
 {
-	if(PCB::running->status==RUNNING){
+
+	if(PCB::running->status==RUNNING || PCB::running->status==IDLE){
 	if (!Timer::context_switch_on_demand) {
 
-
+		/*lock
+		cout<<"TIMER"<<endl;
+		unlock
+*/
 		NodeKer* p = KernelSem::kerList->getHead();
 		while(p!=0)
 		{
@@ -75,8 +81,8 @@ void interrupt Timer::timer(...)
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
 
-		if(PCB::running->getThreadId()==2) PCB::running->status=IDLE;
-		if(PCB::running->getThreadId()!=2 ){
+
+		if(PCB::running!=Idle::getIdlePCB()){
 			PCB::running->status=READY;
 			Scheduler::put(PCB::running);
 		}
@@ -84,10 +90,10 @@ void interrupt Timer::timer(...)
 		PCB::running =Scheduler::get();
 		if(PCB::running==0)
 		{
-			PCB::running = PCB::PCBlist->getIdle();
+			PCB::running = Idle::getIdlePCB();
+		}else{
+			PCB::running->status=RUNNING;
 		}
-		PCB::running->status=RUNNING;
-
 		tsp = PCB::running->sp;
 		tss = PCB::running->ss;
 		tbp = PCB::running->bp;
@@ -127,9 +133,10 @@ void interrupt Timer::timer(...)
 			PCB::running =Scheduler::get();
 			if(PCB::running==0)
 			{
-				PCB::running = PCB::PCBlist->getIdle();
-			}
+				PCB::running = Idle::getIdlePCB();
+			}else{
 			PCB::running->status=RUNNING;
+			}
 			tsp = PCB::running->sp;
 			tss = PCB::running->ss;
 			tbp = PCB::running->bp;

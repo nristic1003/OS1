@@ -27,6 +27,7 @@ public:
 	static void wrapper();
 	void createStartingContext();
 	~PCB();
+	Thread* getThread();
 
 
 

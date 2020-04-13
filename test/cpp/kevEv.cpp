@@ -8,6 +8,10 @@ KernelEv::KernelEv()
 	value = 1;
 	blocked = 0;
 }
+KernelEv::~KernelEv()
+{
+
+}
 
 void KernelEv::wait()
 {
@@ -27,7 +31,7 @@ void KernelEv::signal()
 		blocked->status = READY;
 		Scheduler::put(blocked);
 		blocked=0;
-		dispatch();
+
 	}
 
 }

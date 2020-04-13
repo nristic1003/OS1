@@ -1,15 +1,30 @@
 #include "idle.h"
 #include "PCB.h"
-Idle::Idle(StackSize stackSize, Time timeSlice ): Thread(stackSize, timeSlice)
+Thread* Idle::idle = 0;
+Idle::Idle():Thread(defaultStackSize, 1)
 {
-	//myPCB->status=IDLE;
-	PCB* myPCB = getPCB(); // // SUmnjivo
-myPCB->status = IDLE; // //
+	if(idle==0)
+	{
+		idle=this;
+		PCB* idPCB = getIdlePCB();
+		idPCB->status=IDLE;
+	}
 
 }
 
 
-
+PCB* Idle::getIdlePCB()
+{
+	return idle->myPCB;
+}
+void Idle::idleDelete()
+{
+	if(idle!=0)
+	{
+		delete idle;
+		idle=0;
+	}
+}
 
 Idle::~Idle()
 {

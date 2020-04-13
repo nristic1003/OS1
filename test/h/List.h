@@ -30,7 +30,7 @@ public:
 	void putBlocked(PCB *p, int time);
 	PCB* getFirst();
 	PCB* getIdle();
-	void remove(PCB* p);
+	void remove(PCB* pcb);
 	void removeAll();
 	void decreaseTime();
 	int isEmpty();

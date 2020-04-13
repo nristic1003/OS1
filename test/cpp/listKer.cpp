@@ -28,12 +28,15 @@ void ListKernel::removeAll()
 	{
 		NodeKer *p=head;
 		head=head->next;
+		p->data =0;
 		delete p;
 	}
+	head=0;
+	last=0;
 }
 
 ListKernel::~ListKernel()
 {
 	removeAll();
-	last=0;
+
 }

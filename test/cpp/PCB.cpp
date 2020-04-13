@@ -1,5 +1,13 @@
 #include "PCB.h"
 #include <dos.h>
+#include <iostream.h>
+#define lock asm{\
+ 		pushf;\
+ 		cli;\
+}
+
+// dozvoljava prekide
+#define unlock asm popf
 
 
 
@@ -10,6 +18,9 @@ int PCB::id=0;
 
 PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 {
+	if (s < 12) size = defaultStackSize/sizeof(unsigned);
+	else if (s > 65535) size = 65535/sizeof(unsigned);    // Nemoj kao Anja Markovic i Janko Pasajlic
+	else size = s/sizeof(unsigned);
 	threadId=++id;
 	st1 =0;
 	if(threadId!=1) createStartingContext(); // ID = 1 main nit
@@ -17,9 +28,14 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	waitForMe = new List();
 };
 
+Thread* PCB::getThread(){
+	return thread;
+}
+
 void PCB::createStartingContext()
 {
 	    #ifndef BCC_BLOCK_IGNORE
+
 		st1 = new unsigned[size];
 
 		st1[size-1] =0x200;//setovan I fleg u
@@ -38,12 +54,13 @@ void PCB::createStartingContext()
 void PCB::wrapper()
 {
 	PCB::running->thread->run();
-	PCB::running->status=FINISH;
 	if(PCB::running->waitForMe->isEmpty()==0)
 		{
 			PCB::running->waitForMe->returntoScheduler();
 			PCB::running->waitForMe->removeAll();
 		}
+
+	PCB::running->status=FINISH;
 	dispatch();
 }
 
@@ -52,5 +69,6 @@ ID PCB::getThreadId(){return threadId;}
 
 PCB::~PCB()
 {
+	delete waitForMe;
 	delete[] st1;
 }

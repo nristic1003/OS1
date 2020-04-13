@@ -13,9 +13,11 @@ ListKernel* KernelSem::kerList = new ListKernel();
 
 KernelSem::KernelSem(int init1)
 {
+
 	semValue= init1;
 	PCBblocked = new List();
 	kerList->put(this);
+
 
 
 }
@@ -29,15 +31,15 @@ int KernelSem::wait (Time maxTimeToWait)
 		if(maxTimeToWait<=0){
 			PCB::running->status=BLOCKED;
 			PCBblocked->putBlocked(PCB::running, -1); //cekam dok ne dodje signal, ne vraca me tajmer u scheduler
-
 			dispatch();
+
 			return 1;
 		}else {
 
 				PCB::running->status=BLOCKED;
 				PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
-
 				dispatch();
+				semValue++;
 				return 0;
 		}
 
@@ -54,6 +56,8 @@ int KernelSem::getVal() const
 
 KernelSem:: ~KernelSem ()
 {
+	if(semValue<0)
+		signal(semValue*-1);
 	delete PCBblocked;
 }
 
@@ -66,22 +70,32 @@ int KernelSem::signal(int n)
 		PCB* myPCB=PCBblocked->getFirst();
 		myPCB->status = READY;
 		Scheduler::put(myPCB);
-		unlock
+		PCBblocked->remove(myPCB);
 		return 0;
+		unlock
 
 	}else if(n>0)
 	{
-		lock
+
+
 		int cnt=0;
+		if(!PCBblocked->isEmpty())
+		{
+
 		while(cnt!=n && !PCBblocked->isEmpty())
 		{
+					Node* old = PCBblocked->getHead();
 					semValue++;
-					PCB* myPCB=PCBblocked->getFirst();
-					myPCB->status = READY;
-					Scheduler::put(myPCB);
+					//while(old->data->timeSlice==0 || old->data->timeSlice==-1) old=old->next;
+					//Ne radi dobro jrt getujr uvrk prvi
+					if(old!=0) old->data->status = READY;
+					Scheduler::put(old->data);
+					PCBblocked->remove(old->data);
 					cnt++;
 		}
-		unlock
+		}
+
+
 		return cnt;
 	}
 	return n;

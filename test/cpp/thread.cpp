@@ -3,6 +3,7 @@
 #include "timer.h"
 #include <dos.h>
 #include <iostream.h>
+#include "idle.h"
 
 #define lock asm{\
  		pushf;\
@@ -16,13 +17,15 @@
 
 Thread::Thread (StackSize stackSize, Time timeSlice)
 {
+
 	myPCB = new PCB(this, timeSlice, stackSize);
 	myPCB->status=CREATED;
 	PCB::PCBlist ->put(myPCB);
 }
 Thread::~Thread()
 {
-	waitToComplete();
+	if(myPCB!=Idle::getIdlePCB())
+		waitToComplete();
 	delete myPCB;
 }
 void Thread::start()
@@ -36,13 +39,16 @@ void Thread::start()
 }
 void Thread::waitToComplete()
 {
-
-	if(PCB::running!=this->myPCB && PCB::running!=PCB::PCBlist->getIdle() && myPCB->status!=FINISH )
+#ifndef BCC_BLOCK_IGNORE
+	lock
+	if(PCB::running!=myPCB && myPCB!=Idle::getIdlePCB() && myPCB->status!=FINISH )
 	{
 		PCB::running->status = BLOCKED;
 		myPCB->waitForMe->put(PCB::running);
 		dispatch();
 	}
+	unlock
+#endif
 }
 
 PCB* Thread::getPCB()
@@ -66,7 +72,8 @@ void dispatch()
 
 Thread* Thread::getThreadById(ID id)
 {
-	List* p = PCB::PCBlist;
-	return p->getByID(id)->thread;
+
+	PCB* pthread = PCB::PCBlist->getByID(id);
+	return pthread->getThread();
 
 }

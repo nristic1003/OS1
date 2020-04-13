@@ -14,7 +14,7 @@ public:
 
 
  KernelSem (int init=1);
-virtual ~KernelSem ();
+ virtual ~KernelSem ();
 
   int wait (Time maxTimeToWait);
   int signal(int n=0);

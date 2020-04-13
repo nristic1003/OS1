@@ -20,4 +20,6 @@ void Event::signal()
 Event::~Event()
 {
 
+	delete myImpl;
+
 }

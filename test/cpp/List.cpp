@@ -1,6 +1,7 @@
 #include "List.h"
 #include "SCHEDULE.H"
 #include "PCB.h"
+#include <iostream.h>
 void List::put(PCB* t)
 {
 	Node *node= new Node(t);
@@ -23,21 +24,61 @@ void List::putBlocked(PCB* t, int time)
 		last=node;
 	}
 }
+void List::remove(PCB* pcb)
+{
+	 if(head==0)
+	        return;
+	    if(head->data == pcb){
+	        if(head->next == 0){
+	            delete(head);
+	            head = last = 0;
+	            return;
+	        }
+	        Node* old = head;
+	        head = head->next;
+	        delete old;
+	    }
+	    else{
+	        Node* cur = head;
+	        Node* prev = head;
+	        while((cur->data!=pcb) && (cur->next!=0)){
+	            prev = cur;
+	            cur = cur->next;
+	        }
 
+
+
+	        if((cur->data!=pcb )&& (cur->next==0))
+	            return;
+	        else if((cur->data==pcb) && (cur->next==0)){
+	            last=prev;
+	            prev->next=0;
+	            delete(cur);
+	        }
+	        else{
+	            prev->next = cur->next;
+	            delete(cur);
+	        }
+	    }
+}
 
 void List::decreaseTime()
 {
 	Node* p=head;
 	while(p!=0)
 	{
-		p->timeWait -=1;
+
+		p->timeWait=p->timeWait-1;
 
 		if(p->timeWait==0)
 		{
-			p->data->status=READY;
-			Scheduler::put(p->data);
-		}
-		p=p->next;
+			Node* old = p;
+			p=p->next;
+			old->data->status=READY;
+			Scheduler::put(old->data);
+		//	remove(old->data);
+		}else
+			p=p->next;
 	}
 }
 
@@ -76,37 +117,32 @@ void List::returntoScheduler()
 	}
 }
 
-PCB* List::getIdle()
-{
-	if(head!=0)
-	{
-		Node*p = head;
-		while(p->data->status!=IDLE) p=p->next;
-		return p->data;
-	}
-	return 0;
-
-}
 PCB* List::getByID(ID id)
 {
 	Node*p = head;
-	while(p->data->getThreadId()!=id) p=p->next;
-	return p->data;
+	while(p!=0)
+	{
+		if(p->data->getThreadId()==id) return p->data;
+		p=p->next;
+	}
+	return 0;
+
 
 }
 
-void List::removeAll()
+ void List::removeAll()
 {
 		while(head!=0)
 		{
 			Node *p=head;
 			head=head->next;
+			p->data=0;
 			delete p;
 		}
-
+		head=0; last=0;
 }
 List::~List()
 {
 	removeAll();
-	last=0;
+
 }
