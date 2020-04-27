@@ -9,13 +9,12 @@ class PCB;
 class KernelEv {
 public:
 friend class IVTEntry;
- PCB* blocked;
- KernelEv ();
- ~KernelEv ();
- void wait ();
- void signal();
+	 PCB* blocked;
 
-int value;
+	 KernelEv ();
+	 ~KernelEv ();
+	 void wait ();
+	 void signal();
 
 };
 #endif

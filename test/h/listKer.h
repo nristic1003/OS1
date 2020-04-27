@@ -5,19 +5,19 @@ class KernelSem;
 
 struct NodeKer
 {
-  KernelSem *data;
 
+  KernelSem *data;
   NodeKer *next;
+
   NodeKer (KernelSem *k, NodeKer *n=0):data(k), next(n){}
  ~NodeKer(){}
 
 };
 
-
 class ListKernel
 {
 private:
-	 NodeKer *head;
+	NodeKer *head;
 	NodeKer *last;
 
 public:
@@ -25,13 +25,11 @@ public:
 	{
 		head=last=0;
 	}
-
 	void put(KernelSem *t);
 	NodeKer* getHead();
 	void removeAll();
 	int isEmpty();
+	void checkSemaphores();
 	~ListKernel();
-
 };
-
 #endif

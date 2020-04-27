@@ -50,42 +50,35 @@ int Timer::context_switch_on_demand=0;
 
 void interrupt Timer::timer(...)
 {
-
-	if(PCB::running->status==RUNNING || PCB::running->status==IDLE){
-	if (!Timer::context_switch_on_demand) {
-
-		/*lock
-		cout<<"TIMER"<<endl;
-		unlock
-*/
-		NodeKer* p = KernelSem::kerList->getHead();
-		while(p!=0)
+	if (!Timer::context_switch_on_demand)
 		{
-			KernelSem* ker = p->data;
-			List* blokirani = ker->PCBblocked;
-			blokirani->decreaseTime();
-			p=p->next;
+			KernelSem::kerList->checkSemaphores();
+			tick();
+			cntr--;
 		}
-		tick();
-		cntr--;
-	}
-	if (cntr == 0 || Timer::context_switch_on_demand) {
+	if(PCB::flag!=1)
+	{
+
+	if (cntr == 0 || Timer::context_switch_on_demand){
+	#ifndef BCC_BLOCK_IGNORE
 		asm {
 			// cuva sp
 			mov tsp, sp
 			mov tss, ss
 			mov tbp, bp
 		}
-
+	#endif
 		PCB::running->sp = tsp;
 		PCB::running->ss = tss;
 		PCB::running->bp = tbp;
 
 
-		if(PCB::running!=Idle::getIdlePCB()){
+		if(PCB::running->status!=FINISH && PCB::running->status!=BLOCKED && PCB::running!=Idle::getIdlePCB())
+		{
 			PCB::running->status=READY;
 			Scheduler::put(PCB::running);
 		}
+
 		// scheduler
 		PCB::running =Scheduler::get();
 		if(PCB::running==0)
@@ -99,58 +92,56 @@ void interrupt Timer::timer(...)
 		tbp = PCB::running->bp;
 
 		cntr = PCB::running->timeSlice;
-
+	#ifndef BCC_BLOCK_IGNORE
 		asm {
 			// restaurira sp
 			mov sp, tsp
 			mov ss, tss
 			mov bp, tbp
 		}
+	#endif
+
+
+		if(!PCB::running->queue->isEmpty())
+		{
+			PCB::running->flag=1;
+			NodeQueue* curr=PCB::running->queue->getHead();
+
+			while(curr!=0)
+			{
+				if(PCB::running->blokiraniGLobalno[curr->data]==0 && PCB::running->blokiraniSignali[curr->data]==0 )
+				{
+
+					ListFun* elem = PCB::running->handleri[curr->data];
+					if(elem!=0){
+						NodeFun* hend= elem->getHead();
+						while(hend!=0)
+						{
+
+							hend->data();
+							hend=hend->next;
+						}
+					}
+					NodeQueue* old = curr;
+					curr=curr->next;
+					PCB::running->queue->remove(old->data);
+
+				}else
+				{
+
+					curr=curr->next;
+				}
+			}
+		}
+		PCB::running->flag=0;
+
+
 	}
 
-	// poziv stare prekidne rutine
-	// koja se nalazila na 08h, a sad je na 60h;
-	// poziva se samo kada nije zahtevana promena konteksta
-	// tako da se stara rutina poziva
-	// samo kada je stvarno doslo do prekida
+
 	if(!Timer::context_switch_on_demand) oldISR();
 	Timer::context_switch_on_demand = 0;
-} else if(PCB::running->status==FINISH || PCB::running->status==BLOCKED)
-{
-
-			asm {
-				// cuva sp
-				mov tsp, sp
-				mov tss, ss
-				mov tbp, bp
-			}
-
-			PCB::running->sp = tsp;
-			PCB::running->ss = tss;
-			PCB::running->bp = tbp;
-
-
-			PCB::running =Scheduler::get();
-			if(PCB::running==0)
-			{
-				PCB::running = Idle::getIdlePCB();
-			}else{
-			PCB::running->status=RUNNING;
-			}
-			tsp = PCB::running->sp;
-			tss = PCB::running->ss;
-			tbp = PCB::running->bp;
-
-			cntr = PCB::running->timeSlice;
-
-		asm {
-			// restaurira sp
-			mov sp, tsp
-			mov ss, tss
-			mov bp, tbp
-		}
-		Timer::context_switch_on_demand = 0;
-	}
+}
 }
 
 

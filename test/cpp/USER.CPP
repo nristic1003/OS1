@@ -17,7 +17,7 @@
 //---------------------------------------------------------------------------//
 //  Otkomentarisati ukoliko se testiraju signali
 //---------------------------------------------------------------------------//
-// #define SIGNAL
+ //#define SIGNAL
 //---------------------------------------------------------------------------//
 
 //---------------------------------------------------------------------------//
@@ -140,16 +140,15 @@ int userMain (int argc, char* argv[])
 	Consumer *con;
 	
 	intLock
-/*	if(argc <2){
+	/*if(argc <2){
 		cout<<"Invalid input!"<<endl;
 		intUnlock
 		return -1;
-	}
-	*/
-	int buffSize = 20;//atoi(argv[1]);
-	N = 19; //atoi(argv[2]);
+	}*/
+	int buffSize = 40;//atoi(argv[1]);
+	N = 25;//atoi(argv[2]);
 	//N = N>19 ? 19 : N;
-	TIME_SLICE = 4;//atoi(argv[3]);
+	TIME_SLICE = 2;//atoi(argv[3]);
 	
 	if(buffSize<N) {
 		cout<<"Number of Producers is larger than Buffer size!"<<endl;
@@ -178,6 +177,7 @@ int userMain (int argc, char* argv[])
 		if (i==0)
 		{
 			pro[i]->registerHandler(5, signal1);
+
 		}
 #endif
 		pro[i]->start();

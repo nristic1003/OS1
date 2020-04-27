@@ -11,18 +11,16 @@ class KernelEv;
 
 class IVTEntry
 {
-
 public:
 	 pInterrupt oldISR;
 	 KernelEv* ker;
 	 IVTNo en;
 	 static IVTEntry* arrayEntry[256];
+
 	IVTEntry(IVTNo entry,  pInterrupt newInter);
-	 ~IVTEntry();
+	~IVTEntry();
 	void signal();
 	void callOldmethod();
-
-
 
 };
 #define PREPAREENTRY(entryNum, callOld)\
@@ -32,7 +30,5 @@ public:
 		IVTEntry##entryNum.signal();\
 		if (callOld == 1) IVTEntry##entryNum.callOldmethod();\
 	}\
-
-
 
 #endif

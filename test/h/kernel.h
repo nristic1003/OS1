@@ -15,6 +15,9 @@
 #include <iostream.h>
 #include "kerEv.h"
 #include "IVTEntry.h"
+#include "funList.h"
+#include "queue.h"
+#include <dos.h>
 
 
 

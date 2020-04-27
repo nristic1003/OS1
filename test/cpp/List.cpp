@@ -2,6 +2,7 @@
 #include "SCHEDULE.H"
 #include "PCB.h"
 #include <iostream.h>
+
 void List::put(PCB* t)
 {
 	Node *node= new Node(t);
@@ -26,38 +27,33 @@ void List::putBlocked(PCB* t, int time)
 }
 void List::remove(PCB* pcb)
 {
-	 if(head==0)
-	        return;
-	    if(head->data == pcb){
-	        if(head->next == 0){
-	            delete(head);
-	            head = last = 0;
-	            return;
-	        }
-	        Node* old = head;
-	        head = head->next;
-	        delete old;
-	    }
-	    else{
-	        Node* cur = head;
-	        Node* prev = head;
-	        while((cur->data!=pcb) && (cur->next!=0)){
-	            prev = cur;
-	            cur = cur->next;
-	        }
+	if(head!=0)
+	{
+		Node* prev=0;
+		Node* curr=head;
+		while(curr->data!=pcb)
+		{
+			prev=curr;
+			curr=curr->next;
+		}
+		if(curr==head)
+		{
+			head=head->next;
+			delete curr;
+			return;
+		}else if(curr==last)
+		{
+			last=prev;
+			last->next=0;
+			delete curr;
+			return;
+		}else{
+			prev->next=curr->next;
+			delete curr;
+			return;
+		}
 
-	        if((cur->data!=pcb )&& (cur->next==0))
-	            return;
-	        else if((cur->data==pcb) && (cur->next==0)){
-	            last=prev;
-	            prev->next=0;
-	            delete(cur);
-	        }
-	        else{
-	            prev->next = cur->next;
-	            delete(cur);
-	        }
-	    }
+	}
 }
 
 void List::decreaseTime()
@@ -65,9 +61,7 @@ void List::decreaseTime()
 	Node* p=head;
 	while(p!=0)
 	{
-
 		p->timeWait=p->timeWait-1;
-
 		if(p->timeWait==0)
 		{
 			Node* old = p;
@@ -80,12 +74,6 @@ void List::decreaseTime()
 	}
 }
 
-PCB* List::getFirst()
-{
-	if(head!=0)
-		return head->data;
-	return 0;
-}
 
 int List::isEmpty()
 {
@@ -93,24 +81,26 @@ int List::isEmpty()
 	return 0;
 }
 
-
-
+PCB* List::getFirst()
+{
+	if(head!=0)
+		return head->data;
+	return 0;
+}
 
 void List::returntoScheduler()
 {
-		if(head!=0) {
-
+	if(head!=0)
+	{
 		Node* blockedPCB=head;
 		while(blockedPCB!=0)
-			{
-					blockedPCB->data->status= READY;
-					Scheduler::put(blockedPCB->data);
-					remove(blockedPCB->data);
-					blockedPCB = blockedPCB->next;
-
-			}
-
-	}
+		{
+			blockedPCB->data->status= READY;
+			Scheduler::put(blockedPCB->data);
+			remove(blockedPCB->data);
+			blockedPCB = blockedPCB->next;
+		}
+	 }
 }
 
 PCB* List::getByID(ID id)
@@ -128,14 +118,14 @@ PCB* List::getByID(ID id)
 
  void List::removeAll()
 {
-		while(head!=0)
-		{
-			Node *p=head;
-			head=head->next;
-			p->data=0;
-			delete p;
-		}
-		head=0; last=0;
+	while(head!=0)
+	{
+		Node *p=head;
+		head=head->next;
+		p->data=0;
+		delete p;
+	}
+	head=0; last=0;
 }
 List::~List()
 {

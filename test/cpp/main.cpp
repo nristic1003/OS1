@@ -24,21 +24,12 @@ int counter = 0;
 
 void* operator new(unsigned size) {
 
-
-
   void* ret = malloc(size);
-
-
-
   if(ret==0)
     exit(1);//Out of mem
   counter++;
-
-
-
   return ret;
 }
-
 
 void operator delete(void* loc) {
   if(loc != 0){
@@ -46,7 +37,9 @@ void operator delete(void* loc) {
     free(loc);
   }
 }
+
 extern int userMain(int argc, char* argv[]);
+
 int main(int argc, char* argv[])
 {
 	lock
@@ -55,16 +48,12 @@ int main(int argc, char* argv[])
 #ifndef BCC_BLOCK_IGNORE
 	lock
 	inic();
-	PCB* mainPCB = new PCB(0,1,0);
-	PCB::PCBlist->put(mainPCB);
-
-	cout<<("Kreiran main") <<endl;
-	PCB::running = mainPCB;
-	mainPCB->status = RUNNING;
+	Thread* main = new Thread(0);
 
 	Idle* idl = new Idle();
 	unlock
 #endif
+
 
 	int ret =userMain(argc, argv);
 
@@ -73,25 +62,23 @@ int main(int argc, char* argv[])
 	unlock
 	Idle::idleDelete();
 	lock
+
 		cout<<"Pre PCB "<<counter<<endl;
 		unlock
 	delete PCB::PCBlist;
-		lock
+			lock
 			cout<<"Pre Semafora "<<counter<<endl;
 			unlock
-
 	delete KernelSem::kerList;
+			delete main;
 
-			lock
-				cout<<"Pre konacno "<<counter<<endl;
-				unlock
 	restore();
 
 		if(ret==16) cout<<"OK"<<endl;
+		lock
+						cout<<"Pre konacno "<<counter<<endl;
+						unlock
 
-	return ret;
-
-
-
+return 0;
 
 }

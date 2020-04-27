@@ -1,6 +1,8 @@
 #include "idle.h"
 #include "PCB.h"
+
 Thread* Idle::idle = 0;
+
 Idle::Idle():Thread(defaultStackSize, 1)
 {
 	if(idle==0)
@@ -9,9 +11,7 @@ Idle::Idle():Thread(defaultStackSize, 1)
 		PCB* idPCB = getIdlePCB();
 		idPCB->status=IDLE;
 	}
-
 }
-
 
 PCB* Idle::getIdlePCB()
 {
@@ -19,6 +19,7 @@ PCB* Idle::getIdlePCB()
 }
 void Idle::idleDelete()
 {
+
 	if(idle!=0)
 	{
 		delete idle;

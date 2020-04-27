@@ -2,6 +2,8 @@
 #include "listKer.h"
 #include <dos.h>
 #include <iostream.h>
+
+//zabranjuje prekide
 #define lock asm{\
  		pushf;\
  		cli;\
@@ -17,34 +19,34 @@ KernelSem::KernelSem(int init1)
 	semValue= init1;
 	PCBblocked = new List();
 	kerList->put(this);
-
-
-
 }
 
 int KernelSem::wait (Time maxTimeToWait)
 {
-
+#ifndef BCC_BLOCK_IGNORE
+	lock
 	semValue--;
 	if(semValue<0)
 	{
 		if(maxTimeToWait<=0){
 			PCB::running->status=BLOCKED;
 			PCBblocked->putBlocked(PCB::running, -1); //cekam dok ne dodje signal, ne vraca me tajmer u scheduler
+	unlock
 			dispatch();
-
+	semValue++;
 			return 1;
-		}else {
-
-				PCB::running->status=BLOCKED;
-				PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
-				dispatch();
-				semValue++;
-				return 0;
+		}else{
+					PCB::running->status=BLOCKED;
+					PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
+				unlock
+					dispatch();
+					semValue++;
+					return 0;
 		}
-
 	}
+	unlock
 	return 1;
+#endif
 }
 
 
@@ -59,21 +61,20 @@ KernelSem:: ~KernelSem ()
 	if(semValue<0)
 		signal(semValue*-1);
 	delete PCBblocked;
+	//cout<<"Vrednost na semaforu je: "<<semValue<<endl;
 }
 
 int KernelSem::signal(int n)
 {
 	if(n==0)
 	{
-		lock
 		semValue++;
 		PCB* myPCB=PCBblocked->getFirst();
 		myPCB->status = READY;
 		Scheduler::put(myPCB);
 		PCBblocked->remove(myPCB);
-		return 0;
-		unlock
 
+		return 0;
 	}else if(n>0)
 	{
 

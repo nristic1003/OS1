@@ -1,5 +1,5 @@
-
 #include "listKer.h"
+#include "kerSem.h"
 
 void ListKernel::put(KernelSem* t)
 {
@@ -13,6 +13,18 @@ void ListKernel::put(KernelSem* t)
 	}
 }
 
+void ListKernel::checkSemaphores()
+{
+	NodeKer* p = KernelSem::kerList->getHead();
+		while(p!=0)
+		{
+			KernelSem* ker = p->data;
+			List* blokirani = ker->PCBblocked;
+			blokirani->decreaseTime();
+			p=p->next;
+		}
+}
+
 NodeKer* ListKernel::getHead() {return head;}
 
 int ListKernel::isEmpty()
@@ -20,7 +32,6 @@ int ListKernel::isEmpty()
 	if(head!=0) return 1;
 	return 0;
 }
-
 
 void ListKernel::removeAll()
 {
@@ -31,12 +42,10 @@ void ListKernel::removeAll()
 		p->data =0;
 		delete p;
 	}
-	head=0;
-	last=0;
+	head=last=0;
 }
 
 ListKernel::~ListKernel()
 {
 	removeAll();
-
 }
