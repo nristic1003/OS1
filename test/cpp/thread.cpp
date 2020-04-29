@@ -28,6 +28,8 @@ Thread::~Thread()
 		delete myPCB;
 
 
+
+
 }
 
 
@@ -88,17 +90,19 @@ Thread::Thread(int x)
 {
 	 myPCB = new PCB(this,1,0);
 	PCB::PCBlist->put(myPCB);
-
-	//cout<<("Kreiran main") <<endl;
+	lock
+	cout<<("Kreiran main: " )<< getId() <<endl;
+	unlock
 	PCB::running = myPCB;
 	myPCB->status = RUNNING;
 }
+
 void Thread::signal(SignalId signal)
 {
 	//PCB::flag=0;
 	if(signal>=0 && signal!=2 && signal<16 && myPCB!=PCB::running && myPCB->status!=FINISH)
 	{
-		if(myPCB->handleri[signal]!=0 || signal==0)
+		if(!myPCB->handleri[signal].isEmpty() || signal==0)
 				myPCB->queue->put(signal);
 		//PCB::flag=1;
 		return;
@@ -111,14 +115,11 @@ void Thread::registerHandler(SignalId signal, SignalHandler handler)
 {
 	if(signal>0 && signal<16 && myPCB->status!=FINISH)
 	{
-		if(myPCB->handleri[signal]==0)
-		{
-			myPCB->handleri[signal]= new ListFun();
-			myPCB->handleri[signal]->put(handler);
-		}else
-		{
-			myPCB->handleri[signal]->put(handler);
-		}
+
+		//	myPCB->handleri[signal]= new ListFun();
+			myPCB->handleri[signal].put(handler);
+
+
 	}
 
 }
@@ -127,10 +128,10 @@ void Thread::unregisterAllHandlers(SignalId id)
 {
 	if(id>0 && id<16 && myPCB->status!=FINISH)
 	{
-		if(myPCB->handleri[id]!=0)
+		if(!myPCB->handleri[id].isEmpty())
 		{
-			delete myPCB->handleri[id];
-			myPCB->handleri[id]=0;
+			 myPCB->handleri[id].removeAll();
+			//myPCB->handleri[id]=0;
 		}
 	}
 }
@@ -160,9 +161,9 @@ void Thread::unblockSignal(SignalId signal)
  void Thread::swap(SignalId id, SignalHandler hand1, SignalHandler hand2)
  {
 
-	 if(id>2 && id<16 && myPCB->handleri[id]!=0 && myPCB->status!=FINISH)
+	 if(id>2 && id<16 && !myPCB->handleri[id].isEmpty() && myPCB->status!=FINISH)
 	 {
-		 myPCB->handleri[id]->swap(hand1, hand2);
+		 myPCB->handleri[id].swap(hand1, hand2);
 	 }
  }
 

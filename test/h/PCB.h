@@ -23,7 +23,7 @@ public:
 	enum st status;
 
 	static int flag;
-	ListFun* handleri[16];
+	ListFun handleri[16];
 	int blokiraniSignali[16];
 	static int blokiraniGLobalno[16];
 	Queue* queue;

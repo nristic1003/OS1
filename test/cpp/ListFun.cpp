@@ -2,6 +2,19 @@
 #include "SCHEDULE.H"
 #include "PCB.h"
 #include <iostream.h>
+#include <dos.h>
+
+typedef void (*SignalHandler)();
+#define lock asm{\
+ 		pushf;\
+ 		cli;\
+}
+
+// dozvoljava prekide
+#define unlock asm popf
+
+
+
 
 void ListFun::put(SignalHandler t)
 {
@@ -60,6 +73,7 @@ void ListFun::swap(SignalHandler p1, SignalHandler p2)
 {
 	while(head!=0)
 	{
+
 		NodeFun *p=head;
 		head=head->next;
 		p->data=0;
@@ -67,8 +81,21 @@ void ListFun::swap(SignalHandler p1, SignalHandler p2)
 	}
 	head=0; last=0;
 }
+
+void ListFun::operator =(const ListFun& list) {
+	NodeFun* curr=list.head;
+	while(curr!=0)
+	{
+		put(curr->data);
+		curr=curr->next;
+	}
+}
+
 ListFun::~ListFun()
 {
 	removeAll();
+	/*lock
+	cout<<"delete"<<endl;
+	unlock*/
 
 }

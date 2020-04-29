@@ -17,7 +17,7 @@
 //---------------------------------------------------------------------------//
 //  Otkomentarisati ukoliko se testiraju signali
 //---------------------------------------------------------------------------//
- //#define SIGNAL
+// #define SIGNAL
 //---------------------------------------------------------------------------//
 
 //---------------------------------------------------------------------------//
@@ -145,16 +145,16 @@ int userMain (int argc, char* argv[])
 		intUnlock
 		return -1;
 	}*/
-	int buffSize = 40;//atoi(argv[1]);
-	N = 25;//atoi(argv[2]);
+	int buffSize =500;// atoi(argv[1]);
+	N = 50;//atoi(argv[2]);
 	//N = N>19 ? 19 : N;
 	TIME_SLICE = 2;//atoi(argv[3]);
 	
-	if(buffSize<N) {
+	/*if(buffSize<N) {
 		cout<<"Number of Producers is larger than Buffer size!"<<endl;
 		intUnlock
 		return 1;
-	}
+	}*/
 
 #ifdef SIGNAL
 	Thread *current = Thread::getThreadById(Thread::getRunningId());
@@ -177,7 +177,6 @@ int userMain (int argc, char* argv[])
 		if (i==0)
 		{
 			pro[i]->registerHandler(5, signal1);
-
 		}
 #endif
 		pro[i]->start();

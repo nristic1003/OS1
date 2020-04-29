@@ -27,14 +27,21 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	if(threadId!=1) createStartingContext(); // ID = 1 main nit
 	PCB::PCBlist->put(this);
 	waitForMe = new List();
-	parrent=this;
+
+	if(threadId>2){parrent=PCB::running;}
+	else {parrent=0;}
 	for(int i=0;i<16;i++)
 	{
+		if(threadId>2){
+			handleri[i]=PCB::running->handleri[i];
+		}
 		blokiraniSignali[i] = 0;
-		handleri[i] = 0;
+
 	}
-	handleri[0] = new ListFun();
-	handleri[0]->put(PCB::hendlerKill);
+	//handleri[0] = new ListFun();
+	if(threadId==1) handleri[0].put(PCB::hendlerKill);
+	//handleri[1].put(PCB::hendlerKill);
+//handleri[1]=new ListFun();
 	queue = new Queue();
 
 };
@@ -64,25 +71,29 @@ void PCB::wrapper()
 	PCB::running->emptyWaitingList();
 	PCB::running->status=FINISH;
 
-	PCB::running->parrent->getThread()->signal(1);
+	if(PCB::running->parrent!=0)PCB::running->parrent->getThread()->signal(1);
 	PCB::running->flag=1;
-	if(PCB::running->handleri[2]!=0){
-	NodeFun* curr =PCB::running->handleri[2]->getHead();
+
+
+	if(!PCB::running->handleri[2].isEmpty()){
+	NodeFun* curr =PCB::running->handleri[2].getHead();
 	while(curr!=0)
 	{
+		lock
 		cout<<"HI"<<endl;
+		unlock
 		curr->data();
 		curr=curr->next;
 	}
 	}
 	for(int i=0;i<16;i++)
-		{
-		if(PCB::running->handleri[i]!=0){
-			delete PCB::running->handleri[i];
-			PCB::running->handleri[i] = 0;
-			}
-		}
-
+				{
+				if(!PCB::running->handleri[i].isEmpty()){
+					 PCB::running->handleri[i].removeAll();
+					 //delete PCB::running->handleri[i];
+					// PCB::running->handleri[i] = 0;
+					}
+				}
 	PCB::running->flag=0;
 
 	//izvrsi za dvojku hendlere
@@ -119,18 +130,16 @@ void PCB::hendlerKill()
 {
 	PCB::running->emptyWaitingList();
 	PCB::running->status = FINISH;
-	//PCB::running->parrent->getThread()->signal(1);
+	if(PCB::running->parrent!=0)PCB::running->parrent->getThread()->signal(1);
 	for(int i=0;i<16;i++)
 	{
-		if(PCB::running->handleri[i]!=0){
-		delete PCB::running->handleri[i];
-		PCB::running->handleri[i] = 0;
+		if(!PCB::running->handleri[i].isEmpty()){
+			PCB::running->handleri[i].removeAll();
+		//delete PCB::running->handleri[i];
+	//	PCB::running->handleri[i] = 0;
 		}
 	}
-
-
 	//delete[] PCB::running->blokiraniSignali;
-
 	lock
 	cout<<"ubiven"<<endl;
 	unlock

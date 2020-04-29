@@ -112,9 +112,9 @@ void interrupt Timer::timer(...)
 				if(PCB::running->blokiraniGLobalno[curr->data]==0 && PCB::running->blokiraniSignali[curr->data]==0 )
 				{
 
-					ListFun* elem = PCB::running->handleri[curr->data];
-					if(elem!=0){
-						NodeFun* hend= elem->getHead();
+
+					if(!PCB::running->handleri[curr->data].isEmpty()){
+						NodeFun* hend= (PCB::running->handleri[curr->data]).getHead();
 						while(hend!=0)
 						{
 

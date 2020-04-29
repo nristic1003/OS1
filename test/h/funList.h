@@ -30,6 +30,7 @@ public:
 	void removeAll();
 	int isEmpty();
 	void iterator();
+	void operator= (const ListFun &list);
 	void swap(SignalHandler p1, SignalHandler p2);
 	NodeFun* getHead(){return head;}
 
