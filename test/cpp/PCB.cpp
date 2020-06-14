@@ -27,7 +27,7 @@ PCB::PCB(Thread* thre, Time t, StackSize s):thread(thre), timeSlice(t), size(s)
 	if(threadId!=1) createStartingContext(); // ID = 1 main nit
 	PCB::PCBlist->put(this);
 	waitForMe = new List();
-
+	//SIGNALI
 	if(threadId>2){parrent=PCB::running;}
 	else {parrent=0;}
 	for(int i=0;i<16;i++)
@@ -79,9 +79,6 @@ void PCB::wrapper()
 	NodeFun* curr =PCB::running->handleri[2].getHead();
 	while(curr!=0)
 	{
-		lock
-		cout<<"HI"<<endl;
-		unlock
 		curr->data();
 		curr=curr->next;
 	}
@@ -90,8 +87,7 @@ void PCB::wrapper()
 				{
 				if(!PCB::running->handleri[i].isEmpty()){
 					 PCB::running->handleri[i].removeAll();
-					 //delete PCB::running->handleri[i];
-					// PCB::running->handleri[i] = 0;
+
 					}
 				}
 	PCB::running->flag=0;
@@ -135,24 +131,14 @@ void PCB::hendlerKill()
 	{
 		if(!PCB::running->handleri[i].isEmpty()){
 			PCB::running->handleri[i].removeAll();
-		//delete PCB::running->handleri[i];
-	//	PCB::running->handleri[i] = 0;
 		}
 	}
-	//delete[] PCB::running->blokiraniSignali;
-	lock
-	cout<<"ubiven"<<endl;
-	unlock
 		delete PCB::running->waitForMe;
 		delete[] PCB::running->st1;
 		PCB::running->waitForMe = 0;
 		PCB::running->st1=0; //ok
 		PCB::running->queue->removeAll();
-	//	PCB::running->getThread()->myPCB=0;
-		//PCB::running->thread=0;
-		//PCB::PCBlist->remove(PCB::running);
-
-	PCB::flag=0;
-	dispatch();
+		PCB::flag=0;
+		dispatch();
 }
 

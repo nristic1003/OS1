@@ -38,7 +38,7 @@ int KernelSem::wait (Time maxTimeToWait)
 		}else{
 					PCB::running->status=BLOCKED;
 					PCBblocked->putBlocked(PCB::running, maxTimeToWait); //cekam dok ne dodje signal, ili timer vracam se u scheduler
-				unlock
+					unlock
 					dispatch();
 					semValue++;
 					return 0;
@@ -61,44 +61,40 @@ KernelSem:: ~KernelSem ()
 	if(semValue<0)
 		signal(semValue*-1);
 	delete PCBblocked;
-	//cout<<"Vrednost na semaforu je: "<<semValue<<endl;
 }
 
 int KernelSem::signal(int n)
 {
+#ifndef BCC_BLOCK_IGNORE
+	lock
+	if(semValue>=0)
+		semValue++;
 	if(n==0)
 	{
-		semValue++;
 		PCB* myPCB=PCBblocked->getFirst();
 		myPCB->status = READY;
 		Scheduler::put(myPCB);
 		PCBblocked->remove(myPCB);
-
+		unlock
 		return 0;
 	}else if(n>0)
 	{
-
-
 		int cnt=0;
 		if(!PCBblocked->isEmpty())
 		{
-
-		while(cnt!=n && !PCBblocked->isEmpty())
-		{
-					Node* old = PCBblocked->getHead();
-					semValue++;
-					//while(old->data->timeSlice==0 || old->data->timeSlice==-1) old=old->next;
-					//Ne radi dobro jrt getujr uvrk prvi
-					if(old!=0) old->data->status = READY;
-					Scheduler::put(old->data);
-					PCBblocked->remove(old->data);
-					cnt++;
+			while(cnt!=n && !PCBblocked->isEmpty())
+			{
+						Node* old = PCBblocked->getHead();
+						if(old!=0) old->data->status = READY;
+						Scheduler::put(old->data);
+						PCBblocked->remove(old->data);
+						cnt++;
+			}
 		}
-		}
-
-
+		unlock
 		return cnt;
 	}
+	unlock
 	return n;
-
+#endif
 }

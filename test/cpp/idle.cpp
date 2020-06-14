@@ -17,6 +17,7 @@ PCB* Idle::getIdlePCB()
 {
 	return idle->myPCB;
 }
+
 void Idle::idleDelete()
 {
 
@@ -35,7 +36,5 @@ Idle::~Idle()
 void Idle::run()
 {
 	while(1)
-	{
-
-	}
+	{}
 }

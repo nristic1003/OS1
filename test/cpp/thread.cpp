@@ -85,42 +85,32 @@ Thread* Thread::getThreadById(ID id)
 }
 
 
-//signaliiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+//SIGNALI
 Thread::Thread(int x)
 {
 	 myPCB = new PCB(this,1,0);
 	PCB::PCBlist->put(myPCB);
-	lock
-	cout<<("Kreiran main: " )<< getId() <<endl;
-	unlock
 	PCB::running = myPCB;
 	myPCB->status = RUNNING;
 }
 
 void Thread::signal(SignalId signal)
 {
-	//PCB::flag=0;
 	if(signal>=0 && signal!=2 && signal<16 && myPCB!=PCB::running && myPCB->status!=FINISH)
 	{
 		if(!myPCB->handleri[signal].isEmpty() || signal==0)
 				myPCB->queue->put(signal);
-		//PCB::flag=1;
 		return;
 	}
-	//PCB::flag=1;
+
 
 }
 
 void Thread::registerHandler(SignalId signal, SignalHandler handler)
 {
 	if(signal>0 && signal<16 && myPCB->status!=FINISH)
-	{
-
-		//	myPCB->handleri[signal]= new ListFun();
 			myPCB->handleri[signal].put(handler);
 
-
-	}
 
 }
 
@@ -138,12 +128,12 @@ void Thread::unregisterAllHandlers(SignalId id)
 
 void Thread::blockSignal(SignalId signal)
 {
-	if(signal>=0 && signal<16)
+	if(signal>=0 && signal<16 && myPCB->status!=FINISH)
 		myPCB->blokiraniSignali[signal] = 1;
 }
 void Thread::unblockSignal(SignalId signal)
 {
-	if(signal>=0 && signal<16)
+	if(signal>=0 && signal<16 && myPCB->status!=FINISH)
 		myPCB->blokiraniSignali[signal] = 0;
 }
  void Thread::blockSignalGlobally(SignalId signal)

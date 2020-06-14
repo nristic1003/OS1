@@ -4,7 +4,6 @@ Semaphore::Semaphore(int init1)
 {
 	myImpl= new KernelSem(init1);
 }
-
  int Semaphore::signal(int n)
  {
 	 return myImpl->signal(n);

@@ -145,10 +145,10 @@ int userMain (int argc, char* argv[])
 		intUnlock
 		return -1;
 	}*/
-	int buffSize =500;// atoi(argv[1]);
-	N = 50;//atoi(argv[2]);
+	int buffSize=20 ;// atoi(argv[1]);
+	N = 19;//atoi(argv[2]);
 	//N = N>19 ? 19 : N;
-	TIME_SLICE = 2;//atoi(argv[3]);
+	TIME_SLICE = 1;//atoi(argv[3]);
 	
 	/*if(buffSize<N) {
 		cout<<"Number of Producers is larger than Buffer size!"<<endl;
